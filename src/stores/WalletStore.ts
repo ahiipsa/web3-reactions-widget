@@ -101,11 +101,9 @@ export class WalletStore {
       chainId: config.chainParameters.id,
       connector: metamaskConnector,
     }).then(async (result) => {
-
-      const {account} = result;
       result.connector?.getWalletClient()
       const provider = await result.connector?.getProvider()
-      this.setProvider(provider, account)
+      this.setProvider(provider)
     })
   }
 }
