@@ -6,10 +6,8 @@ import {
   GetNetworkResult,
   GetAccountResult,
 } from '@wagmi/core'
-import {metamaskConnector, wagmiConfig} from '../wagmi/wagmiConfig'
+import {metamaskConnector} from '../wagmi/wagmiConfig'
 import {config} from '../config'
-import {MetaMaskConnector} from "wagmi/connectors/metaMask";
-import {publicProvider} from "wagmi/providers/public";
 
 export class WalletStore {
   _account: GetAccountResult = {
@@ -92,7 +90,7 @@ export class WalletStore {
     return metamaskConnector && metamaskConnector.ready
   }
 
-  setProvider(provider: unknown, address: string) {
+  setProvider(provider: unknown) {
     // const web3Provider = new ethers.providers.Web3Provider(provider)
 
     this.provider = provider;

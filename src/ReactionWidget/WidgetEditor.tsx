@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import styled from "styled-components";
 import {Button} from "../components/Button";
-import {config} from "../config";
 import {createReactionClient, ReactionClient, Widget, WidgetType} from "../clients/contractClient";
 import {walletStore} from "../stores/WalletStore";
 import {encodeWidgetId} from "../utils";
-import {LoadersStore, loadersStore, LoaderStatus} from "../stores/LoadersStore";
+import {loadersStore, LoaderStatus} from "../stores/LoadersStore";
 import {Loader} from "../components/ProcessStatus/Loader";
 import { observer } from 'mobx-react-lite'
 

@@ -4,15 +4,12 @@ import {
   contractReadOnly,
   createReactionClient,
   Reaction,
-  ReactionClient,
   Widget,
-  WidgetType
 } from "../clients/contractClient";
 import {decodeWidgetId} from "../utils";
 import {walletStore} from "../stores/WalletStore";
 import {loadersStore, LoaderStatus} from "../stores/LoadersStore";
 import {Loader} from "../components/ProcessStatus/Loader";
-import {useAccount} from "wagmi";
 
 const REACTIONS = [
   {
@@ -61,12 +58,7 @@ export const ReactionWidget: React.FC<Props> = ({widgetId}) => {
   const [reactionList, setReactionList] = useState<Reaction[]>([]);
   const _widgetId = decodeWidgetId(widgetId).toString();
 
-  const [client, setClient] = useState<ReactionClient>();
 
-
-  useEffect(() => {
-    loadWidget()
-  }, [])
 
   const loadWidget = async () => {
     loadersStore.setLoader('LOAD_WIDGET', {type: LoaderStatus.PROGRESS, render: 'Update reactions...'})
@@ -84,17 +76,19 @@ export const ReactionWidget: React.FC<Props> = ({widgetId}) => {
     loadersStore.setLoader('LOAD_WIDGET', {type: LoaderStatus.IDLE, render: ''})
   }
 
-  const {connector} = useAccount()
+  useEffect(() => {
+    loadWidget()
+    // eslint-disable-next-line
+  }, [])
 
   const handleClickReaction = async (emojiId: number) => {
 
-    // loadersStore.setLoader('UPDATE_REACTIONS', {type: LoaderStatus.PROGRESS, render: 'Update reactions...'});
+    loadersStore.setLoader('UPDATE_REACTIONS', {type: LoaderStatus.PROGRESS, render: 'Update reactions...'});
     if (!walletStore.isConnected) {
       await walletStore.connect();
     }
 
     const client = await createReactionClient({provider: walletStore.provider, address: walletStore.walletAddress })
-    setClient(client)
 
     const reactionList = await contractReadOnly.getWidgetReactions(_widgetId)
     const reaction = reactionList.find((item: Reaction) => item.ownerAddress === walletStore.walletAddress);
@@ -117,7 +111,7 @@ export const ReactionWidget: React.FC<Props> = ({widgetId}) => {
     }
 
     loadWidget()
-    // loadersStore.setLoader('UPDATE_REACTIONS', {type: LoaderStatus.IDLE, render: ''})
+    loadersStore.setLoader('UPDATE_REACTIONS', {type: LoaderStatus.IDLE, render: ''})
   }
 
   if (!widget) {
@@ -144,14 +138,12 @@ export const ReactionWidget: React.FC<Props> = ({widgetId}) => {
   const myReaction = walletStore.isConnected ? reactionList.find((item: Reaction) => item.ownerAddress === walletStore.walletAddress) : null;
 
 
-  // const widgetLoader = loadersStore.getLoader('LOAD_WIDGET')
-  // const updateReactions = loadersStore.getLoader('UPDATE_REACTIONS')
-
-
+  const widgetLoader = loadersStore.getLoader('LOAD_WIDGET')
+  const updateReactions = loadersStore.getLoader('UPDATE_REACTIONS')
 
   return <>
-    {/*{widgetLoader.type === LoaderStatus.PROGRESS && <Loader loader={widgetLoader} />}*/}
-    {/*{updateReactions.type === LoaderStatus.PROGRESS && <Loader loader={updateReactions} />}*/}
+    {widgetLoader.type === LoaderStatus.PROGRESS && <Loader loader={widgetLoader} />}
+    {updateReactions.type === LoaderStatus.PROGRESS && <Loader loader={updateReactions} />}
     {reactionList1.map((reaction) => {
       return <ReactionItem
         key={reaction.emojiId}
